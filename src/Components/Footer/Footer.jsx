@@ -1,8 +1,5 @@
 import './Footer.css'
 
-import IconInsta from '../assets/react.svg'
-import IconX from '../assets/react.svg'
-import IconGithub from '../assets/react.svg'
 
    
 function Footer() {
@@ -10,18 +7,18 @@ function Footer() {
   return (
         <>
             <footer >
-            <div class="Redes">
-                    <img src={IconInsta} alt="Logo_Instagram" class="LOGREDES"/>
-                     <img src={IconX} alt="Logo_Twitter_X" class="LOGREDES" />
-                    <img src={IconGithub} alt="Logo_GitHub" class="LOGREDES" />
+            <div className="Redes">
+                    <img src="/assets/Vectorreal github icon.svg" alt="Logo_Instagram" className="LOGREDES"/>
+                     <img src="/assets/Vectorreal icon Inta.svg" alt="Logo_Twitter_X" className="LOGREDES" />
+                    <img src="/assets/Vectorreal icon X.svg" alt="Logo_GitHub" className="LOGREDES" />
                  </div>
 
-                 <div class="Centrado">
-                    <p id="pfoo" class="texto Centrado">
+                 <div className="Centrado">
+                    <p id="pfoo" className="texto Centrado">
                         © 2024 Sabidos. Todos os direitos reservados.
                     </p>
                 </div>
-                <div class="List">
+                <div className="List">
                     <ul>
                         <li>item</li>
                         <li>item</li>
