@@ -16,11 +16,11 @@ function IconProfile() {
     return (
       <>
       <div class="oi">
-        <img src="icon/IconProfile.svg" alt="sasfasfasf" className='IconProfile' />
+        <img src="icon/sabidinh.svg" alt="sasfasfasf" className='IconProfile' />
 
             <div class="ProfileModal">
               <div className='divmodal'>
-            <img src="icon/IconProfile.svg" alt="sasfasfasf" className='imgmodal' />
+            <img src="icon/sabidinh.svg" alt="sasfasfasf" className='imgmodal' />
             <Link to="/Perfil">  <button className='gerBtn'>Gerenciar sua Conta </button></Link>
                 <button className='logoutBtn'onClick={handleLogout} >Sair da Conta</button>
               </div>

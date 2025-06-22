@@ -83,7 +83,16 @@ body {
   padding-bottom: 0.5rem;
   border-bottom: 2px solid var(--cor-borda);
 }
+.strong{
+  color: white;
+  font-size: 15px;
+}
 
+#live-text {
+  border: 1px solid var(--cor-borda);
+  border-radius: 4px;
+  height: 100px;
+}
 .resumos-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -269,8 +278,8 @@ body {
 }
 
 .btn-salvar {
-  background-color: var(--cor-azul-claro);
-  color: white;
+  background-color: yellow;
+  color: rgb(0, 0, 0);
 }
 
 .btn-salvar:hover {
@@ -288,8 +297,8 @@ body {
 }
 
 .btn-novo {
-  background-color: var(--cor-azul-claro);
-  color: white;
+  background-color: yellow;
+  color: rgb(0, 0, 0);
   margin-top: 1rem;
 }
 

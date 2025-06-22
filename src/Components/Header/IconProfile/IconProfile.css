@@ -1,7 +1,7 @@
 .IconProfile{
-    height: 50px;
+    height: 56px;
     /* padding: 10px; */
-
+    
 }
 
 .ProfileModal{
@@ -22,7 +22,7 @@
     padding: 30px;
 }
 .imgmodal{
-    height: 80px;
+    height: 70px;
 }
 .logoutBtn{
     width: 221px;
