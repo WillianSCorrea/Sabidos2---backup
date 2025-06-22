@@ -2,7 +2,7 @@
     --tam:150px;
 }
 
-header{
+.header{
     display: flex;
     font-family: Arial, Helvetica, sans-serif;
 }

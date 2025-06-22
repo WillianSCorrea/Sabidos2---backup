@@ -2,20 +2,20 @@ import React, { useState, useEffect } from 'react';
 import { getAuth } from 'firebase/auth';
 import { collection, addDoc, query, where, getDocs, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../../firebase/config';
-import './resumo.css';
+import './Resumo.css';
 
 const Resumo = () => {
   const [resumos, setResumos] = useState([]);
   const [titulo, setTitulo] = useState("");
-  const [desc, setDesc] = useState("");
-  const [editando, setEditando] = useState(false);
-  const [idEdicao, setIdEdicao] = useState(null); // Agora vamos usar o ID do documento
+  const [descricao, setDescricao] = useState("");
+  const [modoEdicao, setModoEdicao] = useState(false);
+  const [idEdicao, setIdEdicao] = useState(null);
+  const [carregando, setCarregando] = useState(true);
 
   const auth = getAuth();
   const user = auth.currentUser;
   const userId = user?.uid;
 
-  // Carrega os resumos do Firestore quando o componente monta ou quando o userId muda
   useEffect(() => {
     if (userId) {
       carregarResumos();
@@ -24,160 +24,211 @@ const Resumo = () => {
 
   const carregarResumos = async () => {
     try {
+      setCarregando(true);
       const q = query(collection(db, "resumos"), where("userId", "==", userId));
       const querySnapshot = await getDocs(q);
       
-      const resumosCarregados = [];
-      querySnapshot.forEach((doc) => {
-        resumosCarregados.push({
-          id: doc.id,
-          ...doc.data()
-        });
-      });
+      const resumosCarregados = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
       
       setResumos(resumosCarregados);
     } catch (error) {
       console.error("Erro ao carregar resumos: ", error);
+      alert("Ocorreu um erro ao carregar seus resumos");
+    } finally {
+      setCarregando(false);
     }
   };
 
-  const salvarResumo = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!titulo.trim() && !desc.trim()) {
-      window.alert("Sem título, nem descrição? Aí você me quebra, sabido!");
-      return;
-    }
-
     if (!titulo.trim()) {
-      window.alert("Parece que você esqueceu de inserir um título!");
+      alert("Por favor, insira um título para seu resumo");
       return;
     }
 
-    if (!desc.trim()) {
-      window.alert("Parece que você esqueceu de inserir uma descrição!");
+    if (!descricao.trim()) {
+      alert("Por favor, insira o conteúdo do resumo");
       return;
     }
 
-    const dataFormatada = formatarData(new Date());
+    const dataAtual = formatarData(new Date());
 
     try {
-      if (editando && idEdicao) {
-        // Atualiza no Firestore
+      if (modoEdicao && idEdicao) {
         await updateDoc(doc(db, "resumos", idEdicao), {
           titulo,
-          desc,
-          data: dataFormatada,
+          descricao,
+          data: dataAtual,
           atualizadoEm: new Date().toISOString()
         });
         
-        // Atualiza localmente
         setResumos(resumos.map(resumo => 
-          resumo.id === idEdicao ? { ...resumo, titulo, desc, data: dataFormatada } : resumo
+          resumo.id === idEdicao ? { ...resumo, titulo, descricao, data: dataAtual } : resumo
         ));
       } else {
-        // Adiciona novo no Firestore
         const docRef = await addDoc(collection(db, "resumos"), {
           userId,
           titulo,
-          desc,
-          data: dataFormatada,
+          descricao,
+          data: dataAtual,
           criadoEm: new Date().toISOString(),
           atualizadoEm: new Date().toISOString()
         });
         
-        // Adiciona localmente
         setResumos([...resumos, {
           id: docRef.id,
           titulo,
-          desc,
-          data: dataFormatada
+          descricao,
+          data: dataAtual
         }]);
       }
 
-      // Limpa o formulário
-      setTitulo("");
-      setDesc("");
-      setEditando(false);
-      setIdEdicao(null);
+      resetarFormulario();
     } catch (error) {
       console.error("Erro ao salvar resumo: ", error);
+      alert("Ocorreu um erro ao salvar seu resumo");
     }
   };
 
   const deletarResumo = async (id) => {
+    if (!window.confirm("Tem certeza que deseja excluir este resumo?")) return;
+    
     try {
-      // Remove do Firestore
       await deleteDoc(doc(db, "resumos", id));
-      
-      // Remove localmente
       setResumos(resumos.filter(resumo => resumo.id !== id));
     } catch (error) {
       console.error("Erro ao deletar resumo: ", error);
+      alert("Ocorreu um erro ao excluir o resumo");
     }
   };
 
   const editarResumo = (id) => {
-    const resumoSelecionado = resumos.find(resumo => resumo.id === id);
-    if (resumoSelecionado) {
-      setTitulo(resumoSelecionado.titulo);
-      setDesc(resumoSelecionado.desc);
-      setEditando(true);
+    const resumo = resumos.find(r => r.id === id);
+    if (resumo) {
+      setTitulo(resumo.titulo);
+      setDescricao(resumo.descricao);
+      setModoEdicao(true);
       setIdEdicao(id);
+      document.querySelector('.editor-container').scrollIntoView({ behavior: 'smooth' });
     }
   };
 
   const formatarData = (data) => {
-    const dia = data.getDate();
-    const mes = data.getMonth() + 1;
-    return `${dia}/${mes < 10 ? '0' + mes : mes}`;
+    const dia = data.getDate().toString().padStart(2, '0');
+    const mes = (data.getMonth() + 1).toString().padStart(2, '0');
+    return `${dia}/${mes}`;
   };
 
-  const novoResumo = () => {
+  const resetarFormulario = () => {
     setTitulo("");
-    setDesc("");
-    setEditando(false);
+    setDescricao("");
+    setModoEdicao(false);
     setIdEdicao(null);
   };
 
   return (
-    <div>
-      <main>
-        <div className='container'>
-          <div className="blocoesquerdo">
-            {resumos.map((resumo) => (
-              <div className="bloquinho" key={resumo.id}>
-                <h3>{resumo.titulo}</h3>
-                <p>{resumo.desc}</p>
-                <small>{resumo.data}</small>
-                <div className="acoes">
-                  <button className='btn_del' onClick={() => deletarResumo(resumo.id)}>X</button>
-                  <button className='btn_edt' onClick={() => editarResumo(resumo.id)}>O</button>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className='blocodireito'>
-            <input 
-              type="text" 
-              className='inputTitulo' 
-              placeholder='Título' 
-              value={titulo} 
-              onChange={(e) => setTitulo(e.target.value)} 
-            />
-            <textarea 
-              className='inputDescricao' 
-              placeholder='Digite aqui a descrição' 
-              value={desc} 
-              onChange={(e) => setDesc(e.target.value)} 
-            />
-            <button className='botaoSalv' onClick={salvarResumo}>
-              <img src="485.svg" className='imagem1' alt="Salvar" />
-            </button>
-            <button className='btn_novo' onClick={novoResumo}>Limpar </button>
-          </div>
-        </div>
-      </main>
+    <div className="resumo-app">
+      <header className="app-header">
+        <h1>Meus Resumos</h1>
+        <p className="subtitulo">{modoEdicao ? 'Editando resumo' : 'Adicione novos conhecimentos'}</p>
+      </header>
+
+      <div className="resumo-container">
+        <aside className="lista-resumos">
+          <h2 className="lista-titulo">Seus Resumos</h2>
+          
+          {carregando ? (
+            <div className="carregando">Carregando...</div>
+          ) : resumos.length === 0 ? (
+            <div className="nenhum-resumo">
+              <p>Nenhum resumo encontrado</p>
+              <button onClick={resetarFormulario} className="btn-novo">
+                Criar primeiro resumo
+              </button>
+            </div>
+          ) : (
+            <div className="resumos-grid">
+              {resumos.map((resumo) => (
+                <article className="resumo-card" key={resumo.id}>
+                  <div className="resumo-cabecalho">
+                    <h3>{resumo.titulo}</h3>
+                    <span className="resumo-data">{resumo.data}</span>
+                  </div>
+                  <div className="resumo-conteudo">
+                    <p>{resumo.descricao}</p>
+                  </div>
+                  <div className="resumo-acoes">
+                    <button 
+                      onClick={() => editarResumo(resumo.id)}
+                      className="btn-editar"
+                      aria-label="Editar resumo"
+                    >
+                      <i className="fas fa-edit"></i>
+                    </button>
+                    <button 
+                      onClick={() => deletarResumo(resumo.id)}
+                      className="btn-excluir"
+                      aria-label="Excluir resumo"
+                    >
+                      <i className="fas fa-trash"></i>
+                    </button>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+        </aside>
+
+        <section className="editor-container">
+          <h2 className="editor-titulo">
+            {modoEdicao ? 'Editar Resumo' : 'Novo Resumo'}
+          </h2>
+          
+          <form onSubmit={handleSubmit} className="resumo-form">
+            <div className="form-group">
+              <input
+                type="text"
+                className="titulo-input"
+                placeholder="Título do resumo"
+                value={titulo}
+                onChange={(e) => setTitulo(e.target.value)}
+                maxLength={100}
+              />
+              <small className="contador-caracteres">{titulo.length}/100</small>
+            </div>
+            
+            <div className="form-group">
+              <textarea
+                className="descricao-textarea"
+                placeholder="Digite o conteúdo do resumo aqui..."
+                value={descricao}
+                onChange={(e) => setDescricao(e.target.value)}
+                rows={12}
+              />
+            </div>
+            
+            <div className="form-acoes">
+              <button type="submit" className="btn-salvar">
+                {modoEdicao ? 'Atualizar' : 'Salvar'} Resumo
+              </button>
+              
+              {modoEdicao && (
+                <button 
+                  type="button" 
+                  onClick={resetarFormulario}
+                  className="btn-cancelar"
+                >
+                  Cancelar Edição
+                </button>
+              )}
+            </div>
+          </form>
+        </section>
+      </div>
     </div>
   );
 };

@@ -8,7 +8,7 @@ function Header(props) {
 
   return (
     <>
-    <header>
+    <header className='header'>
       <div className='ajust'>
         <SlideBar></SlideBar>  
         </div>
