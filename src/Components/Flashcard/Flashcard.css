@@ -1,0 +1,236 @@
+.flashcard-container {
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+    min-height: 90vh;
+}
+
+.containerf {
+    display: flex;
+    gap: 20px;
+    max-width: 1200px;
+    width: 100%;
+}
+
+.blocoesquerdoflashcard {
+    width: 250px;
+    height: 750px;
+    background-color: #2E293D;
+    border-radius: 10px;
+    padding: 15px;
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.bloquinhoflashcard {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.bloquinhoflashcard:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.bloquinhoflashcard h5 {
+    margin: 0 0 10px 0;
+    color: #2E293D;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.bloquinhoflashcard .card-content {
+    color: #555;
+    margin-bottom: 10px;
+    font-size: 14px;
+    word-wrap: break-word;
+}
+
+.bloquinhoflashcard small {
+    color: #777;
+    font-size: 12px;
+}
+
+.bloquinhoflashcard.virado {
+    background-color: #e9ecef;
+}
+
+.card-actions {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: 5px;
+}
+
+.btn-flip, .btn_del {
+    border: none;
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.2s;
+}
+
+.btn-flip {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btn-flip:hover {
+    background-color: #5a6268;
+}
+
+.btn_del {
+    background-color: #dc3545;
+    color: white;
+}
+
+.btn_del:hover {
+    background-color: #c82333;
+}
+
+.blocodireitoflashcard {
+    flex: 1;
+    height: 750px;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.blocodireitoflashcard form {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.inputTitulo {
+    padding: 15px;
+    border: none;
+    border-radius: 8px;
+    font-size: 24px;
+    font-weight: bold;
+    background-color: #e9ecef;
+    color: #2E293D;
+    margin-bottom: 15px;
+    resize: none;
+}
+
+.inputDesc {
+    padding: 15px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    background-color: #e9ecef;
+    color: #495057;
+    margin-bottom: 15px;
+    resize: none;
+    flex: 1;
+}
+
+input::placeholder, textarea::placeholder {
+    font-weight: bold;
+    opacity: 0.7;
+    color: #6c757d;
+}
+
+.botao1 {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: none;
+    background-color: #20a38b;
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    align-self: flex-end;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.botao1:hover {
+    background-color: #1a8c77;
+    transform: scale(1.05);
+}
+
+.active-card-view {
+    width: 100%;
+    height: 100%;
+    color: white;
+}
+
+.active-card-view h3 {
+    color: white;
+    margin-bottom: 20px;
+}
+
+.active-card-content {
+    padding: 15px;
+}
+
+.card-sides {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 15px;
+}
+
+.card-side h4 {
+    color: #adb5bd;
+    margin-bottom: 8px;
+}
+
+.card-side p {
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 10px;
+    border-radius: 5px;
+    color: white;
+}
+
+.back-button {
+    background: none;
+    border: none;
+    color: #adb5bd;
+    cursor: pointer;
+    margin-bottom: 15px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+}
+
+.back-button:hover {
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .containerf {
+        flex-direction: column;
+    }
+    
+    .blocoesquerdoflashcard, .blocodireitoflashcard {
+        width: 100%;
+        height: auto;
+    }
+    
+    .blocodireitoflashcard {
+        margin-top: 20px;
+    }
+}

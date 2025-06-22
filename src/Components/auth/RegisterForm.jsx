@@ -1,8 +1,12 @@
+import { doc, setDoc } from "firebase/firestore";
 import React, { useState } from 'react';
 import { cadastrarUsuario } from '../../services/authService';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import './cadastro.css'
+import { getAuth } from "firebase/auth";
+import { db } from "../../firebase/config"; // NÃO ESQUEÇA DE IMPORTAR O db se ainda não tiver
+
 
 function Register() {
  const [dadosUsuario, setDadosUsuario] = useState({
@@ -23,7 +27,7 @@ function Register() {
       setErro('As senhas não coincidem');
       return;
     }
-
+    
     try {
       const result =  await cadastrarUsuario(
         dadosUsuario.nome,
@@ -31,7 +35,18 @@ function Register() {
         dadosUsuario.senha
       );
       if (result.success) {
+        const auth = getAuth();
+        const user = auth.currentUser;
+        
+        if (user) {
+          await setDoc(doc(db, "usuarios", user.uid), {
+            nome: user.displayName ||  dadosUsuario.nome ,
+            email: user.email,
+            criadoEm: new Date()
+          });
+        }
         alert('Cadastro realizado com sucesso!');
+
         navigate('/dashboard'); // Redireciona para página interna
       } else {
         setErro(result.error);
@@ -40,7 +55,9 @@ function Register() {
     } catch (error) {
       setErro(error.message);
     }
+    
   };
+
 
 return (
     <>
@@ -55,7 +72,7 @@ return (
         />
       </header>
       <br />
-      <nav>
+      <nav className="navv">
       <Link to="/login" id="b1">Login </Link>
         <a id="b2" className="luz">Cadastro</a>
       </nav>
@@ -68,7 +85,7 @@ return (
              value={dadosUsuario.nome}
              onChange={(e) => setDadosUsuario({...dadosUsuario, nome: e.target.value})}
              required
-             placeholder="Usuario" 
+             placeholder="Usuário" 
              />
 
             <input className="inputL" 
@@ -107,21 +124,21 @@ return (
         </div>
           </form>
         </div>
-        
-        
         <div id="d4-cad">
           <p id="p">
-            Ao criar uma conta, você concorda com os <br /> nossos
-            <a href="" id="a"> Termos do serviço</a> e com a nossa 
-            <a href="" id="a">Política <br /> de privacidade.</a>
+            Ao se cadastrar, você confirma que compreende e aceita<br></br>como nossa plataforma funciona.
           </p>
-          <Link to="/login">Já tem conta? Faça login</Link>
+          <br />
+          <Link to="/login">LOGIN DO GOOGLE PARA SER COLOCADO AQUI</Link>
+          <br />
+          <br />
+          <Link to="/dashboard">Clique aqui para burlar o Cadastro/Login</Link>
         </div>
+        
       </main>
       
       
     </div>
-    <Link to="/dashboard">Entrar</Link>
     </>
   )
 

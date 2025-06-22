@@ -1,0 +1,14 @@
+.Cfg_Blocos_Laterais{
+    background-color: #C52333;
+    width: 20vh;
+    height: 13vh;
+    border-radius: 10px;
+    padding: 1vh;
+}
+
+.Txt_Blocos_Laterais{
+    color: #EBB2B6;
+    font-weight: bold;
+    font-size: 1.05rem;
+    text-align: center;
+}
