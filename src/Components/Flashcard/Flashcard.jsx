@@ -11,6 +11,7 @@ const Flashcard = () => {
     const [verso, setVerso] = useState("");
     const [cardsVirados, setCardsVirados] = useState([]);
     const [activeCard, setActiveCard] = useState(null);
+    const [carregando, setCarregando] = useState(true);
     
     const auth = getAuth();
     const user = auth.currentUser;
@@ -32,9 +33,10 @@ const Flashcard = () => {
                     ...doc.data()
                 });
             });
-            setCards(loadedCards);
-            // Sort by creation date (newest first)
+            // Ordena por data de criação (mais novos primeiro)
             loadedCards.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            setCards(loadedCards);
+            setCarregando(false);
         });
 
         return () => unsubscribe();
@@ -44,26 +46,24 @@ const Flashcard = () => {
         e.preventDefault();
 
         if (!titulo.trim() && !frente.trim() && !verso.trim()) {
-            window.alert("Sem título, nem conteúdo? Aí você me quebra, sabido!");
+            alert("Por favor, adicione conteúdo ao seu flashcard!");
             return;
         }
 
         if (!titulo.trim()) {
-            window.alert("Parece que você esqueceu de inserir um título!");
+            alert("Por favor, insira um título para seu flashcard!");
             return;
         }
 
         if (!frente.trim()) {
-            window.alert("Parece que você esqueceu de inserir o conteúdo da frente!");
+            alert("Por favor, insira o conteúdo da frente!");
             return;
         }
 
         if (!verso.trim()) {
-            window.alert("Parece que você esqueceu de inserir o conteúdo do verso!");
+            alert("Por favor, insira o conteúdo do verso!");
             return;
         }
-
-        const dataFormatada = formatarData(new Date());
 
         try {
             await addDoc(collection(db, "flashcards"), {
@@ -71,7 +71,7 @@ const Flashcard = () => {
                 titulo: titulo,
                 frente: frente,
                 verso: verso,
-                data: dataFormatada,
+                data: formatarData(new Date()),
                 createdAt: new Date().toISOString()
             });
 
@@ -82,18 +82,18 @@ const Flashcard = () => {
             
         } catch (error) {
             console.error("Erro ao salvar Flashcard: ", error);
-            window.alert("Ocorreu um erro ao salvar o flashcard!");
+            alert("Ocorreu um erro ao salvar o flashcard!");
         }
     }
 
     const deletarFlashcard = async (id, e) => {
         e.stopPropagation();
-        if (window.confirm("Tem certeza que deseja deletar este flashcard?")) {
+        if (window.confirm("Tem certeza que deseja excluir este flashcard?")) {
             try {
                 await deleteDoc(doc(db, "flashcards", id));
             } catch (error) {
                 console.error("Erro ao deletar flashcard: ", error);
-                window.alert("Ocorreu um erro ao deletar o flashcard!");
+                alert("Ocorreu um erro ao excluir o flashcard!");
             }
         }
     }
@@ -108,9 +108,9 @@ const Flashcard = () => {
     };
 
     const formatarData = (date) => {
-        const dia = date.getDate();
-        const mes = date.getMonth() + 1;
-        return `${dia}/${mes < 10 ? '0' + mes : mes}`;
+        const dia = date.getDate().toString().padStart(2, '0');
+        const mes = (date.getMonth() + 1).toString().padStart(2, '0');
+        return `${dia}/${mes}`;
     };
 
     const handleCardClick = (card) => {
@@ -122,91 +122,124 @@ const Flashcard = () => {
     };
 
     return (
-        <div className="flashcard-container">
-            <div className='containerf'>
-                <div className="blocoesquerdoflashcard">
-                    {activeCard ? (
-                        <div className="active-card-view">
-                            <button onClick={handleBackToList} className="back-button">
-                                ← Voltar
+        <div className="flashcard-app">
+            <header className="app-header">
+                <h1>Meus Flashcards</h1>
+                <p className="subtitulo">Crie e revise seus conhecimentos</p>
+            </header>
+
+            <div className="flashcard-container">
+                <aside className="lista-flashcards">
+                    {carregando ? (
+                        <div className="carregando">Carregando flashcards...</div>
+                    ) : activeCard ? (
+                        <div className="visualizacao-detalhada">
+                            <button onClick={handleBackToList} className="btn-voltar">
+                                ← Voltar para lista
                             </button>
-                            <div className="active-card-content">
-                                <h3>{activeCard.titulo}</h3>
-                                <div className="card-sides">
-                                    <div className="card-side">
-                                        <h4>Frente:</h4>
-                                        <p>{activeCard.frente}</p>
+                            <div className="card-detalhado">
+                                <h2>{activeCard.titulo}</h2>
+                                <div className="lados-card">
+                                    <div className="lado-card">
+                                        <h3>Frente</h3>
+                                        <div className="conteudo-card">{activeCard.frente}</div>
                                     </div>
-                                    <div className="card-side">
-                                        <h4>Verso:</h4>
-                                        <p>{activeCard.verso}</p>
+                                    <div className="lado-card">
+                                        <h3>Verso</h3>
+                                        <div className="conteudo-card">{activeCard.verso}</div>
                                     </div>
                                 </div>
-                                <small>Criado em: {activeCard.data}</small>
+                                <div className="card-metadata">
+                                    <span>Criado em: {activeCard.data}</span>
+                                </div>
                             </div>
                         </div>
+                    ) : cards.length === 0 ? (
+                        <div className="nenhum-flashcard">
+                            <p>Nenhum flashcard encontrado</p>
+                            <p>Comece criando seu primeiro flashcard!</p>
+                        </div>
                     ) : (
-                        cards.map((card, index) => (
-                            <div 
-                                className={`bloquinhoflashcard ${cardsVirados.includes(index) ? 'virado' : ''}`} 
-                                key={card.id}
-                                onClick={() => handleCardClick(card, index)}
-                            >
-                                <h5>{card.titulo}</h5>
-                                <div className="card-content">
-                                    {cardsVirados.includes(index) ? card.verso : card.frente}
+                        <div className="grid-flashcards">
+                            {cards.map((card, index) => (
+                                <div 
+                                    className={`card ${cardsVirados.includes(index) ? 'virado' : ''}`} 
+                                    key={card.id}
+                                    onClick={() => handleCardClick(card)}
+                                >
+                                    <div className="card-cabecalho">
+                                        <h3>{card.titulo}</h3>
+                                        <span className="card-data">{card.data}</span>
+                                    </div>
+                                    <div className="card-conteudo">
+                                        {cardsVirados.includes(index) ? card.verso : card.frente}
+                                    </div>
+                                    <div className="card-acoes">
+                                        <button 
+                                            className="btn-virar" 
+                                            onClick={(e) => virarCard(index, e)}
+                                            aria-label="Virar card"
+                                        >
+                                            🔄
+                                        </button>
+                                        <button 
+                                            className="btn-excluir" 
+                                            onClick={(e) => deletarFlashcard(card.id, e)}
+                                            aria-label="Excluir card"
+                                        >
+                                            ×
+                                        </button>
+                                    </div>
                                 </div>
-                                <small>{card.data}</small>
-                                <div className="card-actions">
-                                    <button 
-                                        className='btn-flip' 
-                                        onClick={(e) => virarCard(index, e)}
-                                    >
-                                        🔄
-                                    </button>
-                                    <button 
-                                        className='btn_del' 
-                                        onClick={(e) => deletarFlashcard(card.id, e)}
-                                    >
-                                        X
-                                    </button>
-                                </div>
-                            </div>
-                        ))
+                            ))}
+                        </div>
                     )}
-                </div>
+                </aside>
                 
-                <div className='blocodireitoflashcard'>
-                    <form onSubmit={salvarFlashcard}>
-                        <textarea 
-                            type="text" 
-                            className='inputTitulo' 
-                            placeholder='Título' 
-                            value={titulo} 
-                            onChange={(e) => setTitulo(e.target.value)} 
-                            maxLength={50}
-                        />
-                        <textarea 
-                            type="text" 
-                            className='inputDesc' 
-                            placeholder='Conteúdo da Frente' 
-                            value={frente} 
-                            onChange={(e) => setFrente(e.target.value)} 
-                            rows={5}
-                        />
-                        <textarea 
-                            type="text" 
-                            className='inputDesc' 
-                            placeholder='Conteúdo do Verso' 
-                            value={verso} 
-                            onChange={(e) => setVerso(e.target.value)} 
-                            rows={5}
-                        />
-                        <button type="submit" className='botao1'>
-                            <span>+</span>
-                        </button>
+                <section className="editor-flashcard">
+                    <h2 className="editor-titulo">Criar Novo Flashcard</h2>
+                    <form onSubmit={salvarFlashcard} className="form-flashcard">
+                        <div className="form-group">
+                            <textarea
+                                className="input-titulo"
+                                placeholder="Título do flashcard"
+                                value={titulo}
+                                onChange={(e) => setTitulo(e.target.value)}
+                                maxLength={50}
+                                rows={2}
+                            />
+                            <small className="contador-caracteres">{titulo.length}/50</small>
+                        </div>
+                        
+                        <div className="form-group">
+                            <label>Frente</label>
+                            <textarea
+                                className="input-conteudo"
+                                placeholder="Conteúdo da frente"
+                                value={frente}
+                                onChange={(e) => setFrente(e.target.value)}
+                                rows={5}
+                            />
+                        </div>
+                        
+                        <div className="form-group">
+                            <label>Verso</label>
+                            <textarea
+                                className="input-conteudo"
+                                placeholder="Conteúdo do verso"
+                                value={verso}
+                                onChange={(e) => setVerso(e.target.value)}
+                                rows={5}
+                            />
+                        </div>
+                        
+                        <div className="form-acoes">
+                            <button type="submit" className="btn-salvar">
+                                Salvar Flashcard
+                            </button>
+                        </div>
                     </form>
-                </div>
+                </section>
             </div>
         </div>
     );
