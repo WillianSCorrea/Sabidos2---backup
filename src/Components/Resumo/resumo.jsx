@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { getAuth } from 'firebase/auth';
 import { collection, addDoc, query, where, getDocs, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../../firebase/config';
@@ -11,6 +11,9 @@ const Resumo = () => {
   const [modoEdicao, setModoEdicao] = useState(false);
   const [idEdicao, setIdEdicao] = useState(null);
   const [carregando, setCarregando] = useState(true);
+  const [isListening, setIsListening] = useState(false);
+
+  const recognitionRef = useRef(null);
 
   const auth = getAuth();
   const user = auth.currentUser;
@@ -27,12 +30,12 @@ const Resumo = () => {
       setCarregando(true);
       const q = query(collection(db, "resumos"), where("userId", "==", userId));
       const querySnapshot = await getDocs(q);
-      
+
       const resumosCarregados = querySnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       }));
-      
+
       setResumos(resumosCarregados);
     } catch (error) {
       console.error("Erro ao carregar resumos: ", error);
@@ -65,8 +68,8 @@ const Resumo = () => {
           data: dataAtual,
           atualizadoEm: new Date().toISOString()
         });
-        
-        setResumos(resumos.map(resumo => 
+
+        setResumos(resumos.map(resumo =>
           resumo.id === idEdicao ? { ...resumo, titulo, descricao, data: dataAtual } : resumo
         ));
       } else {
@@ -78,7 +81,7 @@ const Resumo = () => {
           criadoEm: new Date().toISOString(),
           atualizadoEm: new Date().toISOString()
         });
-        
+
         setResumos([...resumos, {
           id: docRef.id,
           titulo,
@@ -96,7 +99,7 @@ const Resumo = () => {
 
   const deletarResumo = async (id) => {
     if (!window.confirm("Tem certeza que deseja excluir este resumo?")) return;
-    
+
     try {
       await deleteDoc(doc(db, "resumos", id));
       setResumos(resumos.filter(resumo => resumo.id !== id));
@@ -130,6 +133,50 @@ const Resumo = () => {
     setIdEdicao(null);
   };
 
+  // CONFIGURAÇÃO DO RECONHECIMENTO DE VOZ
+  useEffect(() => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      console.warn('Este navegador não suporta a Web Speech API');
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'pt-BR';
+    recognition.continuous = true;
+    recognition.interimResults = true;
+
+    recognition.onresult = (event) => {
+      let interimTranscript = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          setDescricao((prev) => prev + ' ' + transcript);
+        } else {
+          interimTranscript += transcript;
+        }
+      }
+      const liveTextDiv = document.getElementById('live-text');
+      if (liveTextDiv) liveTextDiv.innerText = interimTranscript;
+    };
+
+    recognitionRef.current = recognition;
+  }, []);
+
+  const handleMicClick = () => {
+    if (!recognitionRef.current) return;
+
+    if (isListening) {
+      recognitionRef.current.stop();
+    } else {
+      const liveTextDiv = document.getElementById('live-text');
+      if (liveTextDiv) liveTextDiv.innerText = '';
+      recognitionRef.current.start();
+    }
+    setIsListening(!isListening);
+  };
+
   return (
     <div className="resumo-app">
       <header className="app-header">
@@ -140,7 +187,7 @@ const Resumo = () => {
       <div className="resumo-container">
         <aside className="lista-resumos">
           <h2 className="lista-titulo">Seus Resumos</h2>
-          
+
           {carregando ? (
             <div className="carregando">Carregando...</div>
           ) : resumos.length === 0 ? (
@@ -162,14 +209,14 @@ const Resumo = () => {
                     <p>{resumo.descricao}</p>
                   </div>
                   <div className="resumo-acoes">
-                    <button 
+                    <button
                       onClick={() => editarResumo(resumo.id)}
                       className="btn-editar"
                       aria-label="Editar resumo"
                     >
                       <i className="fas fa-edit"></i>
                     </button>
-                    <button 
+                    <button
                       onClick={() => deletarResumo(resumo.id)}
                       className="btn-excluir"
                       aria-label="Excluir resumo"
@@ -187,7 +234,7 @@ const Resumo = () => {
           <h2 className="editor-titulo">
             {modoEdicao ? 'Editar Resumo' : 'Novo Resumo'}
           </h2>
-          
+
           <form onSubmit={handleSubmit} className="resumo-form">
             <div className="form-group">
               <input
@@ -200,7 +247,7 @@ const Resumo = () => {
               />
               <small className="contador-caracteres">{titulo.length}/100</small>
             </div>
-            
+
             <div className="form-group">
               <textarea
                 className="descricao-textarea"
@@ -210,15 +257,40 @@ const Resumo = () => {
                 rows={12}
               />
             </div>
-            
+
+            {/* BOTÃO DO MICROFONE */}
+            <button
+              type="button"
+              onClick={handleMicClick}
+              style={{
+                padding: '10px 20px',
+                backgroundColor: isListening ? '#f44336' : '#4caf50',
+                color: 'white',
+                border: 'none',
+                borderRadius: '5px',
+                cursor: 'pointer',
+                marginBottom: '10px'
+              }}
+            >
+              {isListening ? 'Parar 🎤' : 'Iniciar 🎤'}
+            </button>
+
+            {/* Texto ao vivo da transcrição - Só aparece quando o microfone estiver ligado */}
+            {isListening && (
+              <div style={{ marginTop: '10px', fontSize: '14px', color: '#333' }}>
+                <strong className='strong'>Texto ao vivo:</strong>
+                <p id="live-text" style={{ background: '#eee', padding: '5px', minHeight: '20px', color: 'black' }}></p>
+              </div>
+            )}
+
             <div className="form-acoes">
               <button type="submit" className="btn-salvar">
                 {modoEdicao ? 'Atualizar' : 'Salvar'} Resumo
               </button>
-              
+
               {modoEdicao && (
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   onClick={resetarFormulario}
                   className="btn-cancelar"
                 >

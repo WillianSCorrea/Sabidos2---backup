@@ -46,7 +46,7 @@ body.light-mode {
   width: 100%;
   height: 100%;
   background-color: var(--blue-toggle-background);
-  border: 6px solid var(--blue-toggle-border);
+  border: 3px solid var(--blue-toggle-border);
   border-radius: 999px;
   cursor: pointer;
   position: relative;
@@ -64,17 +64,17 @@ body.light-mode {
 /* MODO CLARO */
 input:checked + .toggle-label {
   background-color: var(--light);
-  border: 6px solid var(--orange-toggle);
+  border: 5px solid var(--orange-toggle);
 }
 
 /* ÍCONE LUA (modo escuro) */
 .slider::after {
   content: "";
   position: absolute;
-  top: 1.5px;
+  top: 4px;
   left: 20px;
   width: 37px;
-  height: 37px;
+  height: 35px;
   background-color: var(--dark);
   border-radius: 50%;
   box-shadow: -16px 0 0 0 #91B6E1;
@@ -83,9 +83,10 @@ input:checked + .toggle-label {
 
 /* ÍCONE SOL (modo claro) */
 input:checked + .toggle-label .slider::after {
-  transform: translateX(27px);
+  transform: translateX(30px);
   background-color: var(--sun-core);
   box-shadow: none;
+  top:2.4px;
 }
 
 /* RAIOS DO SOL: elementos triangulares */
