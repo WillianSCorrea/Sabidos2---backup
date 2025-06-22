@@ -10,6 +10,7 @@ import Agenda from "../pages/Agenda/AgendaPage"
 import Pomodoro from "../pages/Pomodoro/PomodoroPage"
 import Perfil from '../pages/PerfilPage/PerfilPage';
 import Flashcard from '../pages/Flashcard/flashcardPage';
+import AboutUs from '../Components/Sobrenos/sobrenos';
 
 export function AppRoutes() {
   return (
@@ -29,7 +30,7 @@ export function AppRoutes() {
       <Route path="/Pomodoro" element={<Pomodoro />} />
       <Route path="/Perfil" element={<Perfil />} />
       <Route path="/Flashcard" element={<Flashcard />} />
-
+      <Route path="/Sobrenos" element={< AboutUs/>} />
 
 
     </Routes>

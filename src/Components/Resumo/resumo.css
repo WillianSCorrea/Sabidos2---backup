@@ -236,6 +236,7 @@ body {
   box-shadow: 0 0 0 3px rgba(235, 178, 182, 0.3);
 }
 
+
 .contador-caracteres {
   align-self: flex-end;
   font-size: 0.8rem;
@@ -267,7 +268,7 @@ body {
   justify-content: flex-end;
 }
 
-.btn-salvar, .btn-cancelar, .btn-novo {
+.btn-cancelar, .btn-novo {
   padding: 0.8rem 1.5rem;
   border-radius: var(--borda-radius);
   border: none;
@@ -278,8 +279,14 @@ body {
 }
 
 .btn-salvar {
-  background-color: yellow;
+  background-color: #fbcb4e;
   color: rgb(0, 0, 0);
+  width: 150px;
+  height: 60px;
+  font-weight: 600;
+  border-radius: 5px;
+  border: none;
+  font-size: 0.85rem;
 }
 
 .btn-salvar:hover {
@@ -297,7 +304,7 @@ body {
 }
 
 .btn-novo {
-  background-color: yellow;
+  background-color: #fbcb4e;
   color: rgb(0, 0, 0);
   margin-top: 1rem;
 }

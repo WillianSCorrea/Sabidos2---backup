@@ -42,7 +42,6 @@ export default function Home() {
               </p>
             </div>
           </div>
-
           <div className="bloco direita">
             <p className='texto2'>Eficiência é nosso objetivo</p>
             <div className='bloco2'>

@@ -221,10 +221,10 @@ const ProgressoCircular = () => {
                 strokeLinecap="round"
                 transform="rotate(-90)"
               />
-              <text className="timer-text" x="-13" y="-20">
+              <text className="timer-text" x="-16" y="-20">
                 {formatarTempo(tempo)}
               </text>
-              <text className="timer-emoji" x="-26" y="16">
+              <text className="timer-emoji" x="-28" y="16">
                 {modoDescanso ? '😌' : '🍅'}
               </text>
             </g>

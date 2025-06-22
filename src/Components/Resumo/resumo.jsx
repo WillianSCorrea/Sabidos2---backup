@@ -258,22 +258,7 @@ const Resumo = () => {
               />
             </div>
 
-            {/* BOTÃO DO MICROFONE */}
-            <button
-              type="button"
-              onClick={handleMicClick}
-              style={{
-                padding: '10px 20px',
-                backgroundColor: isListening ? '#f44336' : '#4caf50',
-                color: 'white',
-                border: 'none',
-                borderRadius: '5px',
-                cursor: 'pointer',
-                marginBottom: '10px'
-              }}
-            >
-              {isListening ? 'Parar 🎤' : 'Iniciar 🎤'}
-            </button>
+            
 
             {/* Texto ao vivo da transcrição - Só aparece quando o microfone estiver ligado */}
             {isListening && (
@@ -282,8 +267,28 @@ const Resumo = () => {
                 <p id="live-text" style={{ background: '#eee', padding: '5px', minHeight: '20px', color: 'black' }}></p>
               </div>
             )}
+            
 
             <div className="form-acoes">
+              {/* BOTÃO DO MICROFONE */}
+            <button
+              type="button"
+              onClick={handleMicClick}
+              style={{
+                width: '150px',
+                height: '60px',
+                backgroundColor: isListening ? '#f44336' : '#4caf50',
+                color: 'white',
+                fontSize: '0.85rem',
+                border: 'none',
+                borderRadius: '5px',
+                cursor: 'pointer',
+                marginBottom: '10px',
+                fontWeight: '600'
+              }}
+            >
+              {isListening ? 'Parar 🎤' : 'Iniciar 🎤'}
+            </button>
               <button type="submit" className="btn-salvar">
                 {modoEdicao ? 'Atualizar' : 'Salvar'} Resumo
               </button>

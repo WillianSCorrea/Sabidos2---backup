@@ -15,16 +15,32 @@ function IconProfile() {
 
     return (
       <>
-      <div class="oi">
-        <img src="icon/sabidinh.svg" alt="sasfasfasf" className='IconProfile' />
+      <div className="oi">
+  <div className="profile-icon-wrapper">
+    <div className="animated-bg"></div>
+    <img src="icon/sabidinho2.svg" alt="Perfil" className="IconProfile" />
+  </div>
 
-            <div class="ProfileModal">
-              <div className='divmodal'>
-            <img src="icon/sabidinh.svg" alt="sasfasfasf" className='imgmodal' />
-            <Link to="/Perfil">  <button className='gerBtn'>Gerenciar sua Conta </button></Link>
-                <button className='logoutBtn'onClick={handleLogout} >Sair da Conta</button>
-              </div>
-            </div>
+            <div className="ProfileModal">
+  <div className='divmodal'>
+    <div className="profile-icon-wrapper">
+      <div className="animated-bg"></div>
+      <img src="icon/sabidinho2.svg" alt="sasfasfasf" className='imgmodal' />
+    </div>
+
+    <Link to="/Perfil">
+      <button className='gerBtn'>
+        <img src="user.svg" alt="Sair" className="manage"/>
+        <p className='textt'>Gerenciar sua Conta</p>
+        </button>
+    </Link>
+
+    <button className='logoutBtn' onClick={handleLogout}>
+      <img src="/exit.svg" alt="Sair" className="logout-icon" />
+      <p className='sair'>Sair da Conta</p>
+    </button>
+  </div>
+</div>
         </div>
       </>
     )

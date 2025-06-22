@@ -71,30 +71,39 @@ const Dashboard = () => {
                         <div className="tempo_estudo">
                                 <div className='contencao_svgte'>
                                     <div className='blcsvg_do_te'>
-                                        <img src='' className=''>
-    
+                                        <img src='clock.svg' className='clock'>
                                         </img>
                                     </div>
                                 </div>
                                 <div className='blc_do_te'>
                                     <div className="text_estudo">Você estudou por:</div>
                                     <div className="tempo_valor">{totalTrabalho}</div>
+                                    
                                 </div>
                         </div>
 
                         <div className="estatisticas">
                             <div className="itens_ferramentas">
-                                <div className="top-square"></div>
+                                <div className="top-square">
+                                    <img src='notas.svg' className='notas'>
+                                    </img>
+                                </div>
                                 <div className="item-nome">Notas</div>
                                 <div className="item-valor">{totalResumos}</div>
                             </div>
                             <div className="itens_ferramentas">
-                                <div className="top-square"></div>
+                                <div className="top-square">
+                                    <img src='caarta.svg' className='cards'>
+                                    </img>
+                                </div>
                                 <div className="item-nome">Eventos</div>
                                 <div className="item-valor">{totalEvents}</div>
                             </div>
                             <div className="itens_ferramentas">
-                                <div className="top-square"></div>
+                                <div className="top-square">
+                                    <img src='caarta.svg' className='cards'>
+                                    </img>
+                                </div>
                                 <div className="item-nome">Cards</div>
                                 <div className="item-valor">{totalFlashcards}</div>
                             </div>
