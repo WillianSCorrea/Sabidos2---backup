@@ -6,19 +6,22 @@ import { contarDocumentosPorUsuario, SomaTempoDasSeçõesPomo } from "../../serv
 
 const Dashboard = () => {
   const [userId, setUserId] = useState(null);
-  const [stats, setStats] = useState({
-    resumos: 0,
-    eventos: 0,
-    flashcards: 0,
-    tempoEstudo: 0
-  });
+  const [totalResumos, setTotalResumos] = useState(0);
+  const [totalEvents, setTotalEvents] = useState(0);
+  const [totalFlashcards, setTotalFlashcards] = useState(0);
+  const [totalTrabalho, setTotalTrabalho] = useState(0);
   const [carregando, setCarregando] = useState(true);
 
   useEffect(() => {
     const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUserId(user?.uid || null);
+      if (user) {
+        setUserId(user.uid);
+      } else {
+        setUserId(null);
+      }
     });
+
     return () => unsubscribe();
   }, []);
 
@@ -26,126 +29,102 @@ const Dashboard = () => {
     const buscarDados = async () => {
       if (!userId) return;
 
-      try {
-        const [eventos, resumos, flashcards, tempoEstudo] = await Promise.all([
-          contarDocumentosPorUsuario("events", userId),
-          contarDocumentosPorUsuario("resumos", userId),
-          contarDocumentosPorUsuario("flashcards", userId),
-          SomaTempoDasSeçõesPomo(userId)
-        ]);
+      const [events, resumos, flashcards] = await Promise.all([
+        contarDocumentosPorUsuario("events", userId),
+        contarDocumentosPorUsuario("resumos", userId),
+        contarDocumentosPorUsuario("flashcards", userId),
+      ]);
 
-        setStats({
-          resumos,
-          eventos,
-          flashcards,
-          tempoEstudo: formatarTempo(tempoEstudo)
-        });
-      } catch (error) {
-        console.error("Erro ao carregar dados:", error);
-      } finally {
-        setCarregando(false);
-      }
+      setTotalEvents(events);
+      setTotalResumos(resumos);
+      setTotalFlashcards(flashcards);
+
+      const total = await SomaTempoDasSeçõesPomo(userId);
+      setTotalTrabalho(total);
+
+      setCarregando(false);
     };
 
     buscarDados();
   }, [userId]);
 
-  const formatarTempo = (minutos) => {
-    if (!minutos) return "0 min";
-    if (minutos < 60) return `${minutos} min`;
-    const horas = Math.floor(minutos / 60);
-    const mins = minutos % 60;
-    return `${horas}h ${mins}min`;
-  };
-
   if (carregando) {
-    return (
-      <div className="dashboard-loading">
-        <div className="loading-spinner"></div>
-        <p>Carregando seus dados...</p>
-      </div>
-    );
+    return <div className="Dashboard">Carregando dados do usuário...</div>;
   }
 
   return (
-    <div className='dashboard-container'>
-      {/* Saudação */}
-      <div className='dashboard-header'>
-        <div className='welcome-message'>
-          <img src='sabidoOfechado.svg' alt="Sabido" className='welcome-image' />
-          <div className='welcome-text'>
-            <h2>Opa sabido!</h2>
-            <p>Já checou suas notas hoje?</p>
-            <p>Bons estudos, mantenha o foco.</p>
+    <div className='Dashboard'>
+      <div className='mensagemSabido'>
+        <img src='sabidoOfechado.svg' className='imgSabido' alt="Sabido" />
+        <div className='cont'>
+          <div className='cxpTxt'>
+            <p className='txtSabido'>Opa sabido! Já checou suas notas<br /> hoje?</p>
+            <p className='txtSabido'>Bons estudos, mantenha o foco.</p>
           </div>
         </div>
       </div>
 
-      {/* Conteúdo principal */}
-      <div className='dashboard-content'>
-        {/* Atalhos rápidos */}
-        <div className="quick-access">
-          <div className="access-circle main-circle">
-            <img src="sabidoOutline.svg" alt="Menu" />
+      <div className='atEinf'>
+        <div className="atalhos">
+          <div className='contencao'>
+            <Link to='/Agenda'><div className="circulo circulo1"><img src="diario.svg" alt="icone 1" style={{ width: '28px' }} /></div></Link>
+            <Link to='/Resumo'><div className="circulo circulo2"><img src="notas.svg" alt="icone 2" style={{ width: '25px' }} /></div></Link>
+            <Link to='/Pomodoro'><div className="circulo circulo3"><img src="ampulheta.svg" alt="icone 3" style={{ width: '20px' }} /></div></Link>
+            <Link to='/Flashcard'><div className="circulo circulo4"><img src="caarta.svg" alt="icone 4" style={{ width: '28px' }} /></div></Link>
+            <Link to=''><div className="circulo circulo5"><img src="grupo.svg" alt="icone 5" style={{ width: '28px' }} /></div></Link>
+            <div className="circulo-central"><img src="sabidoOutline.svg" alt="icone central" style={{ width: '85px' }} /></div>
           </div>
-          <Link to='/Agenda' className="access-circle circle-1">
-            <img src="diario.svg" alt="Agenda" />
-          </Link>
-          <Link to='/Resumo' className="access-circle circle-2">
-            <img src="notas.svg" alt="Resumos" />
-          </Link>
-          <Link to='/Pomodoro' className="access-circle circle-3">
-            <img src="ampulheta.svg" alt="Pomodoro" />
-          </Link>
-          <Link to='/Flashcard' className="access-circle circle-4">
-            <img src="caarta.svg" alt="Flashcards" />
-          </Link>
-          <Link to='/grupo' className="access-circle circle-5">
-            <img src="grupo.svg" alt="Grupo" />
-          </Link>
         </div>
 
-        {/* Estatísticas */}
-        <div className="stats-container">
-          {/* Tempo de estudo */}
-          <div className="study-time-card">
-            <div className="time-icon">
-              <img src='clock.svg' alt="Relógio" />
+
+        <div className="infos">
+          <div className="tempo_estudo">
+            <div className='contencao_svgte'>
+              <div className='blcsvg_do_te'>
+                <img src='clock.svg' className='clock'>
+                </img>
+              </div>
             </div>
-            <div className="time-info">
-              <h3>Tempo de estudo</h3>
-              <p className="time-value">{stats.tempoEstudo}</p>
+            <div className='blc_do_te'>
+              <div className="text_estudo">Você estudou por:</div>
+              <div className="tempo_valor">{totalTrabalho}</div>
             </div>
           </div>
 
-          {/* Cards de estatísticas */}
-          <div className="stats-cards">
-            <div className="stat-card">
-              <div className="stat-icon">
-                <img src='notas.svg' alt="Notas" />
+
+          <div className="estatisticas">
+            <div className="itens_ferramentas">
+              <div className="top-square">
+                <img src='notas.svg' className='notas'>
+                </img>
               </div>
-              <h4>Resumos</h4>
-              <p>{stats.resumos}</p>
+              <div className="item-nome">Notas</div>
+              <div className="item-valor">{totalResumos}</div>
             </div>
-            <div className="stat-card">
-              <div className="stat-icon">
-                <img src='diario.svg' alt="Eventos" />
+            <div className="itens_ferramentas">
+              <div className="top-square">
+                <img src='caarta.svg' className='cards'>
+                </img>
               </div>
-              <h4>Eventos</h4>
-              <p>{stats.eventos}</p>
+              <div className="item-nome">Eventos</div>
+              <div className="item-valor">{totalEvents}</div>
             </div>
-            <div className="stat-card">
-              <div className="stat-icon">
-                <img src='caarta.svg' alt="Flashcards" />
+            <div className="itens_ferramentas">
+              <div className="top-square">
+                <img src='caarta.svg' className='cards'>
+                </img>
               </div>
-              <h4>Flashcards</h4>
-              <p>{stats.flashcards}</p>
+              <div className="item-nome">Cards</div>
+              <div className="item-valor">{totalFlashcards}</div>
             </div>
+
           </div>
         </div>
       </div>
     </div>
+
   );
 };
 
 export default Dashboard;
+
