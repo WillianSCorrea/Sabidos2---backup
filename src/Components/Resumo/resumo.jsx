@@ -12,9 +12,9 @@ const Resumo = () => {
   const [idEdicao, setIdEdicao] = useState(null);
   const [carregando, setCarregando] = useState(true);
   const [isListening, setIsListening] = useState(false);
+  const autosaveTimeout = useRef(null); // 👈 AUTOSAVE
 
   const recognitionRef = useRef(null);
-
   const auth = getAuth();
   const user = auth.currentUser;
   const userId = user?.uid;
@@ -46,7 +46,7 @@ const Resumo = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    if (e && e.preventDefault) e.preventDefault();
 
     if (!titulo.trim()) {
       alert("Por favor, insira um título para seu resumo");
@@ -133,7 +133,22 @@ const Resumo = () => {
     setIdEdicao(null);
   };
 
-  // CONFIGURAÇÃO DO RECONHECIMENTO DE VOZ
+  // 👇 AUTO SAVE EFFECT
+  useEffect(() => {
+    if (!titulo.trim() && !descricao.trim()) return;
+
+    if (autosaveTimeout.current) clearTimeout(autosaveTimeout.current);
+
+    autosaveTimeout.current = setTimeout(() => {
+      if (titulo.trim() && descricao.trim()) {
+        handleSubmit({ preventDefault: () => {} });
+      }
+    }, 15000);
+
+    return () => clearTimeout(autosaveTimeout.current);
+  }, [titulo, descricao]);
+
+  // 🎙️ RECONHECIMENTO DE VOZ
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
@@ -258,37 +273,33 @@ const Resumo = () => {
               />
             </div>
 
-            
-
-            {/* Texto ao vivo da transcrição - Só aparece quando o microfone estiver ligado */}
             {isListening && (
               <div style={{ marginTop: '10px', fontSize: '14px', color: '#333' }}>
                 <strong className='strong'>Texto ao vivo:</strong>
                 <p id="live-text" style={{ background: '#eee', padding: '5px', minHeight: '20px', color: 'black' }}></p>
               </div>
             )}
-            
 
             <div className="form-acoes">
-              {/* BOTÃO DO MICROFONE */}
-            <button
-              type="button"
-              onClick={handleMicClick}
-              style={{
-                width: '150px',
-                height: '60px',
-                backgroundColor: isListening ? '#f44336' : '#4caf50',
-                color: 'white',
-                fontSize: '0.85rem',
-                border: 'none',
-                borderRadius: '5px',
-                cursor: 'pointer',
-                marginBottom: '10px',
-                fontWeight: '600'
-              }}
-            >
-              {isListening ? 'Parar 🎤' : 'Iniciar 🎤'}
-            </button>
+              <button
+                type="button"
+                onClick={handleMicClick}
+                style={{
+                  width: '150px',
+                  height: '60px',
+                  backgroundColor: isListening ? '#f44336' : '#4caf50',
+                  color: 'white',
+                  fontSize: '0.85rem',
+                  border: 'none',
+                  borderRadius: '5px',
+                  cursor: 'pointer',
+                  marginBottom: '10px',
+                  fontWeight: '600'
+                }}
+              >
+                {isListening ? 'Parar 🎤' : 'Iniciar 🎤'}
+              </button>
+
               <button type="submit" className="btn-salvar">
                 {modoEdicao ? 'Atualizar' : 'Salvar'} Resumo
               </button>
