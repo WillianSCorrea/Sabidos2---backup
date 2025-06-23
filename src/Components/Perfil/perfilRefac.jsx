@@ -1,24 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import './Perfil.css';
 import { supabase } from '../../services/supabaseClient';
-import { getAuth } from 'firebase/auth';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { db } from '../../firebase/config';
 import { doc, updateDoc, getDoc } from 'firebase/firestore';
 
 export default function PerfilUsuario() {
-  const auth = getAuth();
-  const user = auth.currentUser;
-  const userId = user?.uid;
-
+  const [user, setUser] = useState(null);
   const [image, setImage] = useState(null);
   const [fotoPerfilUrl, setFotoPerfilUrl] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Buscar imagem salva no Firestore ao carregar o componente
+  // Observar autenticação e definir usuário
+  useEffect(() => {
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser) {
+        setUser(firebaseUser);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  // Buscar imagem salva no Firestore após usuário estar logado
   useEffect(() => {
     const fetchFoto = async () => {
-      if (!userId) return;
-      const userRef = doc(db, "usuarios", userId);
+      if (!user?.uid) return;
+      const userRef = doc(db, "usuarios", user.uid);
       const snapshot = await getDoc(userRef);
       if (snapshot.exists()) {
         const data = snapshot.data();
@@ -28,10 +37,10 @@ export default function PerfilUsuario() {
       }
     };
     fetchFoto();
-  }, [userId]);
+  }, [user]);
 
   const uploadImage = async () => {
-    if (!image || !userId) {
+    if (!image || !user?.uid) {
       alert("Selecione uma imagem e esteja logado!");
       return;
     }
@@ -39,7 +48,7 @@ export default function PerfilUsuario() {
     setLoading(true);
 
     const fileExt = image.name.split('.').pop();
-    const fileName = `${userId}_${Date.now()}.${fileExt}`;
+    const fileName = `${user.uid}_${Date.now()}.${fileExt}`;
 
     // Upload da imagem no Supabase
     const { error: uploadError } = await supabase
@@ -63,21 +72,17 @@ export default function PerfilUsuario() {
     setFotoPerfilUrl(publicUrl);
 
     // Salvar URL no Firestore
-   const salvarUrlNoFirestore = async (userId, urlImagem) => {
-  const userRef = doc(db, 'usuarios', userId);
+    const userRef = doc(db, 'usuarios', user.uid);
 
-  try {
-    await updateDoc(userRef, {
-      fotoPerfilUrl: urlImagem
-    });
-    console.log('URL da imagem salva com sucesso no Firestore!');
-    alert("Imagem enviada com sucesso!");
-  } catch (error) {
-    console.error('Erro ao salvar URL da imagem no Firestore:', error);
-  }
-};
-
-    salvarUrlNoFirestore(userId, publicUrl);
+    try {
+      await updateDoc(userRef, {
+        fotoPerfilUrl: publicUrl
+      });
+      console.log('URL da imagem salva com sucesso no Firestore!');
+      alert("Imagem enviada com sucesso!");
+    } catch (error) {
+      console.error('Erro ao salvar URL da imagem no Firestore:', error);
+    }
 
     setLoading(false);
   };
@@ -88,11 +93,15 @@ export default function PerfilUsuario() {
         <div className="box1">
           <figure>
             <img
-              src={ user?.photoURL || fotoPerfilUrl || "https://api.dicebear.com/7.x/initials/svg?seed=" + (user?.displayName || "Usuário")}
+              src={
+                user?.photoURL ||
+                fotoPerfilUrl ||
+                `https://api.dicebear.com/7.x/initials/svg?seed=${user?.displayName || "Usuário"}`
+              }
               alt="Foto de Perfil"
               className="imgPerfil"
             />
-            <img src="edit.svg" className='img2' alt="Editar" />
+            <img src="edit.svg" className="img2" alt="Editar" />
           </figure>
           <h1 className="NomePerfil">{user?.displayName || "Nome não definido"}</h1>
         </div>
@@ -104,12 +113,12 @@ export default function PerfilUsuario() {
           </button>
 
           <div className="info1">
-            <h3 className='user'>Usuário</h3>
-            <p className='user2'>{user?.displayName || "Não definido"}</p>
+            <h3 className="user">Usuário</h3>
+            <p className="user2">{user?.displayName || "Não definido"}</p>
           </div>
           <div className="info2">
-            <h3 className='email'>Email</h3>
-            <p className='email2'>{user?.email}</p>
+            <h3 className="email">Email</h3>
+            <p className="email2">{user?.email}</p>
           </div>
         </div>
       </div>

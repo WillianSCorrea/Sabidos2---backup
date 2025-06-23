@@ -43,6 +43,7 @@ function Register() {
             nome: user.displayName ||  dadosUsuario.nome ,
             email: user.email,
             criadoEm: new Date()
+            
           });
         }
         alert('Cadastro realizado com sucesso!');
