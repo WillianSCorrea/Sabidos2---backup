@@ -1,15 +1,13 @@
-import React from 'react'
-
 import Header from '../../Components/Header/Header';
 import Footer from '../../Components/Footer/Footer';
-import AboutUs from '../../Components/Sobrenos/sobrenos';
+import SobreNos from '../../Components/Sobrenos/SobreNos';
 
 
 const AboutUs = () => {
   return (
     <>
     <Header title='Sobre nós'/>
-    <AboutUs/>
+    <SobreNos/>
     <Footer/>
     </>
   )
