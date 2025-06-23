@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { getAuth } from 'firebase/auth';
 import { collection, addDoc, query, where, getDocs, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../../firebase/config';
-import './Resumo.css';
+import './resumo.css';
 
 const Resumo = () => {
   const [resumos, setResumos] = useState([]);
