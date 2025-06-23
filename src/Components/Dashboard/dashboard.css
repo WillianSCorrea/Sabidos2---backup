@@ -31,16 +31,12 @@
 
 .txtSabido {
   color: #EEE;
-  font-family: Inter;
   font-size: 15px;
   font-style: normal;
   font-weight: 700;
   line-height: 25px;
-  letter-spacing: 1.5px;
+  letter-spacing: 1px;
   text-align: start;
-  width: fit-content;
-  height: fit-content;
-  padding-right: 35px;
 }
 
 .imgSabido {
@@ -143,6 +139,14 @@
   justify-content: center;
   align-items: center;
 }
+.clock{
+  height: 45px;
+  translate: -0.3px 1.5px;
+}
+.notas, .eventos, .cards{
+  height: 20px;
+  translate: 1px 2px;
+}
 
 .blcsvg_do_te {
   width: 60px;
@@ -160,7 +164,7 @@
 
 .tempo_estudo {
   width: 310px;
-  height: 80px;
+  height: 120px;
   background-color: #423E51;
   margin: 20px 10px;
   border-radius: 5px;
@@ -173,6 +177,7 @@
 .tempo_valor {
   font-size: 40px;
   font-weight: bold;
+  translate: -1px -15px;
 }
 
 .estatisticas {
@@ -202,9 +207,12 @@
 
 .itens_ferramentas,
 .blc_do_te {
-  color: #FFF
+  color: #FFF;
+  border-radius: 5px;
 }
-
+.text_estudo{
+  translate: 0px -7px;
+}
 .top-square {
   width: 30px;
   height: 30px;
@@ -243,6 +251,7 @@
     padding-right: 0;
     text-align: center;
     align-self: center;
+    font-family: Arial, Helvetica, sans-serif;
   }
 
   .atalhos,
