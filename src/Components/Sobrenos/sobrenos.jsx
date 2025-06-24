@@ -1,5 +1,5 @@
 import React from 'react'
-import './SobreNos.css'
+// import './SobreNos.css'
 import Sobre from '../../data/ContatoSabidos.json'
 
 const SobreNos = () => {
