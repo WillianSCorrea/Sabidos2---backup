@@ -13,6 +13,7 @@ export default function PerfilUsuario() {
   const [image, setImage] = useState(null);
   const [fotoPerfilUrl, setFotoPerfilUrl] = useState(null);
   const [loading, setLoading] = useState(false);
+  const fileInputRef = React.useRef(null)
 
   // Buscar imagem salva no Firestore ao carregar o componente
   useEffect(() => {
@@ -98,7 +99,7 @@ export default function PerfilUsuario() {
         </div>
 
         <div className="box2">
-          <input type="file" accept="image/*" onChange={e => setImage(e.target.files[0])} />
+          <input type="file" accept="image/*" ref={fileInputRef} onChange={e => setImage(e.target.files[0])} style={{display: 'none'}}/>
           <button onClick={uploadImage} disabled={loading}>
             {loading ? 'Enviando...' : 'Enviar'}
           </button>
