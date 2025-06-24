@@ -1,6 +1,6 @@
 import Header from '../../Components/Header/Header';
 import Footer from '../../Components/Footer/Footer';
-import SobreNos from '../../Components/Sobrenos/sobrenos';
+import SobreNos from '../../Components/Sobrenos/SobreNos';
 
 
 const AboutUs = () => {

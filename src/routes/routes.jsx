@@ -10,7 +10,7 @@ import Agenda from "../pages/Agenda/AgendaPage"
 import Pomodoro from "../pages/Pomodoro/PomodoroPage"
 import Perfil from '../pages/PerfilPage/PerfilPage';
 import Flashcard from '../pages/Flashcard/flashcardPage';
-import AboutUs from '../Components/Sobrenos/sobrenos';
+import AboutUs from '../pages/sobrenos/sobrenos';
 
 export function AppRoutes() {
   return (
