@@ -1,6 +1,5 @@
-import './SobreNos.css'
 import Sobre from '../../data/ContatoSabidos.json'
-
+import '../Sobrenos/CompAboutUs.css'
 const CompAboutUs = () => {
     return (
         <div className='container-snos'>
