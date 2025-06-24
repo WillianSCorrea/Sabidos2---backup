@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import './Agenda.css';
-import { db, collection, addDoc, query, onSnapshot  } from '../../firebase/config';
+import { db, collection, addDoc, query, onSnapshot } from '../../firebase/config';
 import { getAuth } from "firebase/auth";
-import {  where } from "firebase/firestore";
+import { where, doc, updateDoc, deleteDoc } from "firebase/firestore";
 
 function Agenda() {
     const [currentDate, setCurrentDate] = useState(new Date());
@@ -10,34 +10,38 @@ function Agenda() {
     const [modalVisible, setModalVisible] = useState(false);
     const [eventTitle, setEventTitle] = useState("");
     const [events, setEvents] = useState([]);
+    const [editModalVisible, setEditModalVisible] = useState(false);
+    const [eventToEdit, setEventToEdit] = useState(null);
+    const [editedTitle, setEditedTitle] = useState("");
+
     const auth = getAuth();
     const user = auth.currentUser;
     const userId = user?.uid;
 
-   useEffect(() => {
-    const auth = getAuth();
-    const unsubscribeAuth = auth.onAuthStateChanged((user) => {
-        if (user) {
-            const q = query(
-                collection(db, "events") , where("userId", "==", user.uid)
-            );
+    useEffect(() => {
+        const auth = getAuth();
+        const unsubscribeAuth = auth.onAuthStateChanged((user) => {
+            if (user) {
+                const q = query(
+                    collection(db, "events"), where("userId", "==", user.uid)
+                );
 
-            const unsubscribeSnapshot = onSnapshot(q, (querySnapshot) => {
-                const loadedEvents = [];
-                querySnapshot.forEach((doc) => {
-                    loadedEvents.push({ id: doc.id, ...doc.data() });
+                const unsubscribeSnapshot = onSnapshot(q, (querySnapshot) => {
+                    const loadedEvents = [];
+                    querySnapshot.forEach((doc) => {
+                        loadedEvents.push({ id: doc.id, ...doc.data() });
+                    });
+                    setEvents(loadedEvents);
                 });
-                setEvents(loadedEvents);
-            });
 
-            // Clean up snapshot listener
-            return () => unsubscribeSnapshot();
-        }
-    });
+                // Clean up snapshot listener
+                return () => unsubscribeSnapshot();
+            }
+        });
 
-    // Clean up auth listener
-    return () => unsubscribeAuth();
-}, []);
+        // Clean up auth listener
+        return () => unsubscribeAuth();
+    }, []);
 
 
     const renderCalendar = () => {
@@ -89,7 +93,7 @@ function Agenda() {
         if (selectedDate && eventTitle) {
             try {
                 await addDoc(collection(db, "events"), {
-                    userId : userId,
+                    userId: userId,
                     title: eventTitle,
                     date: selectedDate,
                     createdAt: new Date().toISOString()
@@ -102,10 +106,67 @@ function Agenda() {
             }
         }
     };
-    
+
+    const handleAbrirModal = (event) => {
+        setEventToEdit(event);
+        setEditedTitle(event.title);
+        setEditModalVisible(true);
+    };
+    const handleEditarEvento = async () => {
+        try {
+            const eventRef = doc(db, "events", eventToEdit.id);
+            await updateDoc(eventRef, {
+                title: editedTitle
+            });
+            setEditModalVisible(false);
+        } catch (error) {
+            console.error("Erro ao atualizar evento: ", error);
+        }
+    };
+
+    const handleDeletarEvento = async () => {
+        try {
+            const eventRef = doc(db, "events", eventToEdit.id);
+            await deleteDoc(eventRef);
+            setEditModalVisible(false);
+        } catch (error) {
+            console.error("Erro ao deletar evento: ", error);
+        }
+    };
+
+
+
 
     return (
+
         <div className="agenda">
+            {editModalVisible && (
+                <div id="edit-event-modal" className="modal">
+                    <div className="modal-content">
+                        <span className="close" onClick={() => setEditModalVisible(false)}>
+                            &times;
+                        </span>
+                        <h2>Editar Evento</h2>
+                        <form>
+                            <label htmlFor="edit-title">Novo Título:</label>
+                            <input
+                                type="text"
+                                id="edit-title"
+                                value={editedTitle}
+                                onChange={(e) => setEditedTitle(e.target.value)}
+                            />
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1rem' }}>
+                                <button type="button" onClick={handleEditarEvento}>
+                                    Salvar Alterações
+                                </button>
+                                <button type="button" onClick={handleDeletarEvento} style={{ backgroundColor: 'red', color: 'white' }}>
+                                    Excluir
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
             <main className='main-agenda'>
                 <div className="calendar-container">
                     <div className="calendar-header">
@@ -181,13 +242,12 @@ function Agenda() {
                     <div className="events-box">
                         {events.length > 0 ? (
                             events.map((event) => {
-                                // Converte o campo `date` para um formato legível
                                 const formattedDate = event.date instanceof Object
                                     ? new Date(event.date.seconds * 1000).toLocaleDateString('pt-BR')
                                     : event.date;
 
                                 return (
-                                    <div key={event.id} className="event-item">
+                                    <div key={event.id} className="event-item" onClick={() => handleAbrirModal(event)}>
                                         <span className="event-date">{formattedDate}</span>
                                         <h4 className="event-title">{event.title}</h4>
                                     </div>

@@ -129,11 +129,6 @@ return (
           <p id="p">
             Ao se cadastrar, você confirma que compreende e aceita<br></br>como nossa plataforma funciona.
           </p>
-          <br />
-          <Link to="/login">LOGIN DO GOOGLE PARA SER COLOCADO AQUI</Link>
-          <br />
-          <br />
-          <Link to="/dashboard">Clique aqui para burlar o Cadastro/Login</Link>
         </div>
         
       </main>
